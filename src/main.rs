@@ -1,48 +1,34 @@
-use {
-    anyhow::{anyhow, Error as AnyhowError},
-    atty::{is as is_a_tty, Stream},
-    std::{
-        env::args,
-        io::{stdout, Write},
-        process::{exit, Command},
-    },
+use anyhow::{anyhow, Context};
+use clap::Parser;
+use crossterm::{
+    execute,
+    terminal::{EnterAlternateScreen, LeaveAlternateScreen},
 };
-fn main() {
-    let found_tty = is_a_tty(Stream::Stdin) && is_a_tty(Stream::Stderr);
-    eprintln!("found_tty: {:#?}", found_tty);
-    if found_tty {
-        let stdout = stdout();
-        let mut stdout = stdout.lock();
-        write!(stdout, "\x1b[?1049h").unwrap();
-        stdout.flush().unwrap();
-    }
-    let error_code = run();
-    if found_tty {
-        let stdout = stdout();
-        let mut stdout = stdout.lock();
-        write!(stdout, "\x1b[?1049l").unwrap();
-        stdout.flush().unwrap();
-    }
-    exit(error_code.unwrap_or_else(|e| {
-        eprintln!("{}", e);
-        1
-    }));
+use std::{ffi::OsString, io::stdout, process::Command};
+
+#[derive(Debug, Parser)]
+struct Cli {
+    command: OsString,
+    args: Vec<OsString>,
 }
 
-fn run() -> Result<i32, AnyhowError> {
-    let mut args = args().skip(1);
-    Command::new(
-        args.next()
-            .ok_or_else(|| anyhow!("fatal: no command provided to execute"))?,
-    )
-    .args(args)
-    .spawn()
-    .map_err(|e| anyhow!("fatal: failed to spawn child process: {}", e))?
-    .wait()
-    .map_err(|e| anyhow!("fatal: failed waiting for child process: {}", e))
-    .and_then(|status| {
-        status
-            .code()
-            .ok_or_else(|| anyhow!("warning: failed to get error code from child process"))
-    })
+fn main() -> anyhow::Result<()> {
+    let Cli { command, args } = Cli::parse();
+
+    execute!(stdout(), EnterAlternateScreen)
+        .map_err(|e| anyhow!("failed to enter alternate screen: {}", e))?;
+
+    let mut child = Command::new(command)
+        .args(&args)
+        .spawn()
+        .context("failed to spawn command")?;
+
+    child
+        .wait()
+        .context("failed to get command's exit status")?;
+
+    execute!(stdout(), LeaveAlternateScreen)
+        .map_err(|e| anyhow!("failed to exit alternate screen: {e}"))?;
+
+    Ok(())
 }
