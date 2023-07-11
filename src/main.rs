@@ -9,13 +9,13 @@ use std::{ffi::OsString, io::stdout, process::Command, str::FromStr};
 
 #[derive(Debug, Parser)]
 struct Cli {
-    #[clap(long)]
+    #[clap(long, value_parser = PauseOption::from_str)]
     pause: Option<Option<PauseOption>>,
     command: OsString,
     args: Vec<OsString>,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 enum PauseOption {
     No,
     Silent,
