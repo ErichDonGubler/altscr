@@ -58,7 +58,7 @@ fn main() -> anyhow::Result<()> {
     } = Cli::parse();
 
     let pause = pause
-        .unwrap_or(Some(PauseOption::No))
+        .unwrap_or(Some(PauseOption::Print))
         .unwrap_or(PauseOption::Print)
         .into_pause_config();
 
