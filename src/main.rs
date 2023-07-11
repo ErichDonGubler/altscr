@@ -11,8 +11,8 @@ use std::{ffi::OsString, io::stdout, process::Command, str::FromStr};
 struct Cli {
     #[clap(long, value_parser = PauseOption::from_str)]
     pause: Option<Option<PauseOption>>,
-    command: OsString,
-    args: Vec<OsString>,
+    #[clap(raw(true))]
+    command_and_args: Vec<OsString>,
 }
 
 #[derive(Clone, Debug)]
@@ -53,9 +53,12 @@ struct PauseConfig {
 fn main() -> anyhow::Result<()> {
     let Cli {
         pause,
-        command,
-        args,
+        command_and_args,
     } = Cli::parse();
+
+    let (command, args) = command_and_args
+        .split_first()
+        .context("no command provided")?;
 
     let pause = pause
         .unwrap_or(Some(PauseOption::Print))
@@ -66,7 +69,7 @@ fn main() -> anyhow::Result<()> {
         .map_err(|e| anyhow!("failed to enter alternate screen: {}", e))?;
 
     let mut child = Command::new(command)
-        .args(&args)
+        .args(args)
         .spawn()
         .context("failed to spawn command")?;
 
