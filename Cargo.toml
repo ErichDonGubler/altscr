@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["Erich Gubler <erichdongubler@gmail.com>"]
 edition = "2021"
 repository = "https://github.com/ErichDonGubler/dab"
+license = "MIT OR Apache-2.0"
 
 [dependencies]
 anyhow = { version = "1.0.56", features = ["backtrace"] }

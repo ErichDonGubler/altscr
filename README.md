@@ -8,3 +8,8 @@ can quarantine the noise to an alternative screen buffer with `dab --
 
 [1]: https://terminalguide.namepad.de/mode/p47/
 [2]: https://learn.microsoft.com/en-us/windows/console/console-virtual-terminal-sequences#alternate-screen-buffer
+
+## Licensing
+
+This project is dual-licensed under [MIT](./LICENSE-MIT) and [Apache
+2.0](./LICENSE-APACHE).
