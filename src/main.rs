@@ -5,9 +5,15 @@ use crossterm::{
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use std::{ffi::OsString, io::stdout, process::Command, str::FromStr};
+use std::{
+    ffi::{OsStr, OsString},
+    io::stdout,
+    process::Command,
+    str::FromStr,
+};
 
 #[derive(Debug, Parser)]
+#[command(about, author, version)]
 struct Cli {
     #[clap(long, value_parser = PauseOption::from_str)]
     pause: Option<Option<PauseOption>>,
@@ -66,8 +72,20 @@ fn main() -> anyhow::Result<()> {
         .into_pause_config();
 
     execute!(stdout(), EnterAlternateScreen)
+        // We can still bail here if this doesn't work, whew!
         .map_err(|e| anyhow!("failed to enter alternate screen: {}", e))?;
 
+    let run_res = run(command, args, pause);
+
+    if let Err(e) = execute!(stdout(), LeaveAlternateScreen) {
+        let e = anyhow!("warning: failed to exit alternate screen: {e}");
+        eprintln!("{e:#}");
+    }
+
+    run_res
+}
+
+fn run(command: &OsStr, args: &[OsString], pause: Option<PauseConfig>) -> anyhow::Result<()> {
     let mut child = Command::new(command)
         .args(args)
         .spawn()
@@ -91,9 +109,6 @@ fn main() -> anyhow::Result<()> {
         }
         disable_raw_mode().map_err(|e| anyhow!("failed to enter raw mode: {e}"))?;
     }
-
-    execute!(stdout(), LeaveAlternateScreen)
-        .map_err(|e| anyhow!("failed to exit alternate screen: {e}"))?;
 
     Ok(())
 }
