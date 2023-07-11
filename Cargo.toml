@@ -2,7 +2,7 @@
 name = "dab"
 version = "0.1.0"
 authors = ["Erich Gubler <erichdongubler@gmail.com>"]
-edition = "2018"
+edition = "2021"
 repository = "https://github.com/ErichDonGubler/dab"
 
 [dependencies]
