@@ -1,6 +1,6 @@
+use altscr::{run_in_alt_screen_buf, FinishedRunOutcome, PauseConfig, RunInAltScreenBufOutcome};
 use anyhow::{bail, Context};
 use clap::Parser;
-use dab::{run_in_alt_screen_buf, FinishedRunOutcome, PauseConfig, RunInAltScreenBufOutcome};
 use std::{ffi::OsString, process::ExitCode, str::FromStr};
 
 #[derive(Debug, Parser)]
@@ -81,7 +81,7 @@ fn main() -> ExitCode {
                 .map(|code| {
                     let code = u8::try_from(code).unwrap_or_else(|_e| {
                         eprintln!(
-                            "dab: warning: child exit code ({code}) is larger than maximum value \
+                            "altscr: warning: child exit code ({code}) is larger than maximum value \
                             of single byte, truncating"
                         );
                         code as u8
@@ -89,21 +89,21 @@ fn main() -> ExitCode {
                     ExitCode::from(code)
                 })
                 .unwrap_or_else(|| {
-                    eprintln!("dab: child process was terminated by signal");
+                    eprintln!("altscr: child process was terminated by signal");
                     ExitCode::from(253)
                 });
             match pause_res {
                 Ok(()) => (),
                 Err(e) => {
                     let e = anyhow::Error::new(e);
-                    eprintln!("dab: warning: succeeded in waiting for child process, but {e:#}");
+                    eprintln!("altscr: warning: succeeded in waiting for child process, but {e:#}");
                 }
             }
             exit_code
         }
         Err(e) => {
             let e = anyhow::Error::new(e);
-            eprintln!("dab: error: {e:#}");
+            eprintln!("altscr: error: {e:#}");
             return ExitCode::from(254);
         }
     };
@@ -112,7 +112,7 @@ fn main() -> ExitCode {
         Ok(()) => (),
         Err(e) => {
             let e = anyhow::Error::new(e);
-            eprintln!("dab: warning: {e:#}");
+            eprintln!("altscr: warning: {e:#}");
             return ExitCode::from(2);
         }
     }
@@ -120,7 +120,7 @@ fn main() -> ExitCode {
         Ok(()) => (),
         Err(e) => {
             let e = anyhow::Error::new(e);
-            eprintln!("dab: warning: {e:#}");
+            eprintln!("altscr: warning: {e:#}");
             return ExitCode::from(2);
         }
     }

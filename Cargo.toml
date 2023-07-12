@@ -1,9 +1,9 @@
 [package]
-name = "dab"
+name = "altscr"
 version = "0.1.0"
 authors = ["Erich Gubler <erichdongubler@gmail.com>"]
 edition = "2021"
-repository = "https://github.com/ErichDonGubler/dab"
+repository = "https://github.com/ErichDonGubler/altscr"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
