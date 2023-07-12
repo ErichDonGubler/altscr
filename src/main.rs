@@ -78,10 +78,15 @@ fn main() -> ExitCode {
             } = finished;
             let exit_code = exit_status
                 .code()
-                .map(|_code| {
-                    // Don't use the code yet! Let's preserve this behavior until at least next
-                    // commit, this diff is already bad enough. :laugh:
-                    ExitCode::SUCCESS
+                .map(|code| {
+                    let code = u8::try_from(code).unwrap_or_else(|_e| {
+                        eprintln!(
+                            "dab: warning: child exit code ({code}) is larger than maximum value \
+                            of single byte, truncating"
+                        );
+                        code as u8
+                    });
+                    ExitCode::from(code)
                 })
                 .unwrap_or_else(|| {
                     eprintln!("dab: child process was terminated by signal");

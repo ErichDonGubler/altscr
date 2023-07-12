@@ -74,7 +74,6 @@ pub struct FinishedRunOutcome {
     pub pause_res: Result<(), PauseError>,
 }
 
-// TODO: preserve exit status
 fn run_and_pause(
     command: &OsStr,
     args: &[OsString],
