@@ -6,6 +6,8 @@ edition = "2021"
 repository = "https://github.com/ErichDonGubler/altscr"
 license = "MIT OR Apache-2.0"
 description = "run a command in an ALTernate SCReen buffer"
+categories = ["command-line-utilities"]
+keywords = ["cli", "ansi", "terminal"]
 
 [dependencies]
 anyhow = { version = "1.0.56", features = ["backtrace"] }
