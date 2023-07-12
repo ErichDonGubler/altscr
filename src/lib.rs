@@ -61,7 +61,7 @@ fn run_and_pause(
                 break;
             }
         }
-        disable_raw_mode().map_err(|e| anyhow!("failed to enter raw mode: {e}"))?;
+        disable_raw_mode().map_err(|e| anyhow!("failed to exit raw mode: {e}"))?;
     }
 
     Ok(())
