@@ -18,6 +18,6 @@ This project is dual-licensed under [MIT](./LICENSE-MIT) and [Apache
 
 ### Does this project have any relation to [`dievilz/altscr`]
 
-Nope! The name for this project was come up indepently. 😅
+Nope! The name for this project was created independently. 😅
 
 [`dievilz/altscr`]: https://github.com/dievilz/altscr
