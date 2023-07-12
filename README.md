@@ -1,7 +1,7 @@
 # `altscr`: run a command in an ALTernate SCReen buffer
 
-`altscr` is a cross-platform command-line tool for running a command entirely
-within an alternate screen buffer<sup>[1], [2]</sup>. Have you ever felt the
+`altscr` is a cross-platform command-line tool for running a command within an
+alternate screen buffer<sup>[1], [2]</sup>. Have you ever felt the
 need to clear your terminal after running a particularly noisy command? Now, you
 can quarantine the noise to an alternative screen buffer with `altscr --
 <command>`!
