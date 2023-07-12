@@ -98,7 +98,7 @@ fn main() -> ExitCode {
         }
         Err(e) => {
             let e = anyhow::Error::new(e);
-            eprintln!("error: {e:#}");
+            eprintln!("dab: error: {e:#}");
             return ExitCode::from(254);
         }
     };
@@ -107,7 +107,7 @@ fn main() -> ExitCode {
         Ok(()) => (),
         Err(e) => {
             let e = anyhow::Error::new(e);
-            eprintln!("warning: {e:#}");
+            eprintln!("dab: warning: {e:#}");
             return ExitCode::from(2);
         }
     }
@@ -115,7 +115,7 @@ fn main() -> ExitCode {
         Ok(()) => (),
         Err(e) => {
             let e = anyhow::Error::new(e);
-            eprintln!("warning: {e:#}");
+            eprintln!("dab: warning: {e:#}");
             return ExitCode::from(2);
         }
     }
