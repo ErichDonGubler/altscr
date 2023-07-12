@@ -1,16 +1,7 @@
-use anyhow::{anyhow, bail, Context};
+use anyhow::{bail, Context};
 use clap::Parser;
-use crossterm::{
-    event::{self, Event},
-    execute,
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
-};
-use std::{
-    ffi::{OsStr, OsString},
-    io::stdout,
-    process::Command,
-    str::FromStr,
-};
+use dab::{run_in_alt_screen_buf, PauseConfig};
+use std::{ffi::OsString, str::FromStr};
 
 #[derive(Debug, Parser)]
 #[command(about, author, version)]
@@ -51,11 +42,6 @@ impl PauseOption {
     }
 }
 
-#[derive(Debug, Default)]
-struct PauseConfig {
-    silent: bool,
-}
-
 fn main() -> anyhow::Result<()> {
     let Cli {
         pause,
@@ -71,44 +57,6 @@ fn main() -> anyhow::Result<()> {
         .unwrap_or(PauseOption::Print)
         .into_pause_config();
 
-    execute!(stdout(), EnterAlternateScreen)
-        // We can still bail here if this doesn't work, whew!
-        .map_err(|e| anyhow!("failed to enter alternate screen: {}", e))?;
-
-    let run_res = run(command, args, pause);
-
-    if let Err(e) = execute!(stdout(), LeaveAlternateScreen) {
-        let e = anyhow!("warning: failed to exit alternate screen: {e}");
-        eprintln!("{e:#}");
-    }
-
-    run_res
-}
-
-fn run(command: &OsStr, args: &[OsString], pause: Option<PauseConfig>) -> anyhow::Result<()> {
-    let mut child = Command::new(command)
-        .args(args)
-        .spawn()
-        .context("failed to spawn command")?;
-
-    child
-        .wait()
-        .context("failed to get command's exit status")?;
-
-    if let Some(PauseConfig { silent }) = pause {
-        if !silent {
-            println!("dab: Press any key to exit alternate buffer...");
-        }
-        enable_raw_mode().map_err(|e| anyhow!("failed to enter raw mode: {e}"))?;
-        loop {
-            if let Event::Key(_key) =
-                event::read().map_err(|e| anyhow!("failed to read next input event: {e}"))?
-            {
-                break;
-            }
-        }
-        disable_raw_mode().map_err(|e| anyhow!("failed to enter raw mode: {e}"))?;
-    }
-
-    Ok(())
+    run_in_alt_screen_buf(command, args, pause)
+        .context("failed to run command in alternate buffer")
 }
