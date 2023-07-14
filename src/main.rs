@@ -1,4 +1,7 @@
-use altscr::{run_in_alt_screen_buf, FinishedRunOutcome, PauseConfig, RunInAltScreenBufOutcome};
+use altscr::{
+    enter_alt_screen_buf, exit_alt_screen_buf, run_in_alt_screen_buf, FinishedRunOutcome,
+    PauseConfig, RunInAltScreenBufOutcome,
+};
 use anyhow::{bail, Context};
 use clap::Parser;
 use std::{ffi::OsString, process::ExitCode, str::FromStr};
@@ -6,6 +9,19 @@ use std::{ffi::OsString, process::ExitCode, str::FromStr};
 #[derive(Debug, Parser)]
 #[command(about, author, version)]
 struct Cli {
+    #[clap(subcommand)]
+    subcommand: Subcommand,
+}
+
+#[derive(Debug, Parser)]
+enum Subcommand {
+    Enter,
+    Exit,
+    Run(RunSubcommand),
+}
+
+#[derive(Debug, Parser)]
+struct RunSubcommand {
     #[clap(long, value_parser = PauseOption::from_str)]
     pause: Option<Option<PauseOption>>,
     #[clap(raw(true))]
@@ -43,10 +59,32 @@ impl PauseOption {
 }
 
 fn main() -> ExitCode {
-    let Cli {
+    let Cli { subcommand } = Cli::parse();
+
+    match subcommand {
+        Subcommand::Enter => match enter_alt_screen_buf() {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(e) => {
+                eprintln!("dab: failed to enter alternate screen buffer: {e}");
+                ExitCode::FAILURE
+            }
+        },
+        Subcommand::Exit => match exit_alt_screen_buf() {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(e) => {
+                eprintln!("dab: failed to enter alternate screen buffer: {e}");
+                ExitCode::FAILURE
+            }
+        },
+        Subcommand::Run(cmd) => run(cmd),
+    }
+}
+
+fn run(config: RunSubcommand) -> ExitCode {
+    let RunSubcommand {
         pause,
         command_and_args,
-    } = Cli::parse();
+    } = config;
 
     let (command, args) = match command_and_args
         .split_first()
