@@ -16,7 +16,7 @@ can quarantine the noise to an alternative screen buffer with `altscr --
 This project is dual-licensed under [MIT](./LICENSE-MIT) and [Apache
 2.0](./LICENSE-APACHE).
 
-### Does this project have any relation to [`dievilz/altscr`]
+### Does this project have any relation to [`dievilz/altscr`]?
 
 Nope! The name for this project was created independently. 😅
 
