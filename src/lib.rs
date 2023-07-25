@@ -89,7 +89,7 @@ fn run_and_pause(
             let mut pause_res = Ok(());
             if let Some(PauseConfig { silent }) = pause {
                 if !silent {
-                    println!("altscr: Press any key to exit alternate buffer...");
+                    print!("altscr: Press any key to exit alternate buffer...");
                 }
                 pause_res = enable_raw_mode()
                     .map_err(|source| PauseError::EnterRawMode { source })
