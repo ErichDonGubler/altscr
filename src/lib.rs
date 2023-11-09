@@ -8,9 +8,17 @@ use error::{
 };
 use std::{
     ffi::{OsStr, OsString},
-    io::stdout,
+    io::{self, stdout},
     process::{Command, ExitStatus},
 };
+
+pub fn enter_alt_screen_buf() -> io::Result<()> {
+    execute!(stdout(), EnterAlternateScreen)
+}
+
+pub fn exit_alt_screen_buf() -> io::Result<()> {
+    execute!(stdout(), LeaveAlternateScreen)
+}
 
 #[derive(Debug, Default)]
 pub struct PauseConfig {
@@ -22,7 +30,7 @@ pub fn run_in_alt_screen_buf(
     args: &[OsString],
     pause: Option<PauseConfig>,
 ) -> RunInAltScreenBufOutcome {
-    match execute!(stdout(), EnterAlternateScreen)
+    match enter_alt_screen_buf()
         .map_err(|source| RunInAltScreenBufError::EnterAltScreenBuf { source })
     {
         Ok(()) => (),
@@ -42,7 +50,7 @@ pub fn run_in_alt_screen_buf(
     let run_res = run_res.map_err(|source| RunInAltScreenBufError::Run { source });
 
     let exit_alt_screen_err =
-        execute!(stdout(), LeaveAlternateScreen).map_err(|source| ExitAltScreenBufError { source });
+        exit_alt_screen_buf().map_err(|source| ExitAltScreenBufError { source });
 
     RunInAltScreenBufOutcome {
         run_res,
