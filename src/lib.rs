@@ -8,7 +8,7 @@ use error::{
 };
 use std::{
     ffi::{OsStr, OsString},
-    io::{self, stdout},
+    io::{self, stdout, Read},
     process::{Command, ExitStatus},
 };
 
@@ -99,23 +99,38 @@ fn run_and_pause(
                 if !silent {
                     print!("altscr: Press any key to exit alternate buffer...");
                 }
-                pause_res = enable_raw_mode()
-                    .map_err(|source| PauseError::EnterRawMode { source })
-                    .and_then(|()| {
-                        loop {
-                            if let Event::Key(_key) = event::read()
-                                .map_err(|source| PauseError::GetInputEvent { source })?
-                            {
+                execute!(stdout(), crossterm::event::DisableMouseCapture).unwrap();
+                pause_res = {
+                    loop {
+                        match event::read().map_err(|source| PauseError::GetInputEvent { source }) {
+                            Ok(Event::Key(_key)) => break,
+                            Ok(evt) => eprintln!("unexpected event: {evt:?}"),
+
+                            Err(e) => {
+                                pause_res = Err(e);
                                 break;
                             }
                         }
-                        Ok(())
-                    })
-                    .map(|res| {
-                        exit_raw_mode_after_pause_err = disable_raw_mode()
-                            .map_err(|source| ExitRawModeAfterPauseError { source });
-                        res
-                    });
+                    }
+                    Ok(())
+                };
+                // pause_res = enable_raw_mode()
+                //     .map_err(|source| PauseError::EnterRawMode { source })
+                //     .and_then(|()| {
+                //         loop {
+                //             if let Event::Key(_key) = event::read()
+                //                 .map_err(|source| PauseError::GetInputEvent { source })?
+                //             {
+                //                 break;
+                //             }
+                //         }
+                //         Ok(())
+                //     })
+                //     .map(|res| {
+                //         exit_raw_mode_after_pause_err = disable_raw_mode()
+                //             .map_err(|source| ExitRawModeAfterPauseError { source });
+                //         res
+                //     });
             }
             FinishedRunOutcome {
                 exit_status,
